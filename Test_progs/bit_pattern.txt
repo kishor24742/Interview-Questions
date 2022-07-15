@@ -1,0 +1,102 @@
+/******************************************************************************
+
+Welcome to GDB Online.
+GDB online is an online compiler and debugger tool for C, C++, Python, PHP, Ruby, 
+C#, OCaml, VB, Perl, Swift, Prolog, Javascript, Pascal, HTML, CSS, JS
+Code, Compile, Run and Debug online from anywhere in world.
+
+*******************************************************************************/
+#include <stdio.h>
+#include <stdlib.h>
+
+#define ONCE while(0)
+typedef enum{Error=-1, False, True} Result;
+
+Result find_bit_pattern(void *data, int datasize, void *pattern, int pattern_size)
+{
+    // Assuming datasize in bytes & pattern_size in bits
+    Result res = False;
+    do
+    {
+        if((datasize==0) || (pattern_size==0) || (pattern_size>(datasize*8)))
+        {
+            res = Error;
+            break;
+        }
+        else
+        {
+            char *r_data=(char *)data;
+            char *patt_data=(char *)pattern;
+            char *bit_str=(char *)malloc(datasize*8);
+            char* patt_str=(char *)malloc(pattern_size);
+            
+            for (int i=0; i<datasize; i++)
+            {
+                for(int j=0; j<8; j++)
+                {
+                    bit_str[(i*8)+j]=(r_data[i]>>j) & 1U;
+                }
+            }
+            for(int i=(datasize*8)-1; i>=0; i--)
+            {
+                printf("%d ", bit_str[i]);
+            }
+            printf("\n");
+            for(int i=0; i<pattern_size; i++)
+            {
+                patt_str[i]=(*patt_data>>i) & 1U;
+            }
+            
+            for(int i=pattern_size-1; i>=0; i--)
+            {
+                printf("%d ", patt_str[i]);
+            }
+            printf("\n");
+            
+            int j=0;
+            for(int i=0; i<(datasize*8); )
+            {
+                j=0;
+                while(j<pattern_size)
+                {
+                    if(bit_str[i]==patt_str[j])
+                    {
+                        i++;
+                        j++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                //printf("after while, i=%d j=%d\n", i, j);
+                if(j && j==(pattern_size))
+                    return True;
+                else
+                    i++;
+            }
+        }
+            
+    }ONCE;
+    
+    
+    return res;
+}
+
+int main()
+{
+    int raw = 0xab;
+    int pattern = 0x7;
+    int datasize = 1;
+    int pattern_size = 3;
+    
+    Result res = find_bit_pattern(&raw, datasize, &pattern, pattern_size);
+    if(res == Error)
+        printf("Cannot find the bit pattern\n");
+    else if(res == True)
+        printf("Found bit pattern\n");
+    else
+        printf("Not found bit pattern\n");
+        
+    return 0;
+}
